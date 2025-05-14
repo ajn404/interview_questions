@@ -39,6 +39,7 @@ import {
     Sparkles,
 } from "lucide-react";
 import { useState } from "react";
+import Link from "next/link";
 
 interface InterviewQuestion {
     id: string;
@@ -372,9 +373,11 @@ const MenuPage = () => {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <Button variant="outline" size="sm" className="w-full">
-                                    查看详情
-                                </Button>
+                                <Link href={`/menu/${question.id}`}>
+                                    <Button variant="outline" size="sm" className="w-full">
+                                        查看详情
+                                    </Button>
+                                </Link>
                             </CardContent>
                         </Card>
                     ))}
