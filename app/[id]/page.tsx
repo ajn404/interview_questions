@@ -9,18 +9,23 @@ import { BookOpen, Clock, Code, FileText, MessageSquare, Star, ThumbsUp } from '
 
 interface InterviewQuestionProps {
   title: string
-  difficulty: 'easy' | 'medium' | 'hard'
-  category: string
-  tags: string[]
+  questionType: 'algorithm' | 'business' | 'theory' | 'system-design' | 'database' | 'frontend' | 'devops' | 'machine-learning' | 'behavioral'
+  difficulty?: 'easy' | 'medium' | 'hard'
+  category?: string
+  tags?: string[]
   description: string
-  examples: {
+  examples?: {
     input: string
     output: string
     explanation?: string
   }[]
-  constraints: string[]
+  constraints?: string[]
   solution?: string
   hints?: string[]
+  answer?: string
+  analysis?: string
+  followUps?: string[]
+  resources?: { name: string; url: string }[]
   relatedQuestions?: {
     id: string
     title: string
@@ -29,6 +34,7 @@ interface InterviewQuestionProps {
 
 function InterviewQuestionDetail({
   title,
+  questionType,
   difficulty,
   category,
   tags,
@@ -37,6 +43,10 @@ function InterviewQuestionDetail({
   constraints,
   solution,
   hints,
+  answer,
+  analysis,
+  followUps,
+  resources,
   relatedQuestions,
 }: InterviewQuestionProps) {
   return (
@@ -70,7 +80,7 @@ function InterviewQuestionDetail({
               {difficulty === 'easy' ? '简单' : difficulty === 'medium' ? '中等' : '困难'}
             </Badge>
             <Badge variant="secondary">{category}</Badge>
-            {tags.map((tag) => (
+            {tags?.map((tag) => (
               <Badge key={tag} variant="outline">{tag}</Badge>
             ))}
           </div>
@@ -83,10 +93,17 @@ function InterviewQuestionDetail({
                 <FileText className="mr-2 h-4 w-4" />
                 题目描述
               </TabsTrigger>
-              <TabsTrigger value="solution">
-                <Code className="mr-2 h-4 w-4" />
-                题解
-              </TabsTrigger>
+              {questionType === 'algorithm' ? (
+                <TabsTrigger value="solution">
+                  <Code className="mr-2 h-4 w-4" />
+                  题解
+                </TabsTrigger>
+              ) : (
+                <TabsTrigger value="answer">
+                  <Code className="mr-2 h-4 w-4" />
+                  参考答案
+                </TabsTrigger>
+              )}
               <TabsTrigger value="discussion">
                 <MessageSquare className="mr-2 h-4 w-4" />
                 讨论
@@ -97,52 +114,73 @@ function InterviewQuestionDetail({
               <div className="prose prose-sm max-w-none dark:prose-invert">
                 <p>{description}</p>
               </div>
-              
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">示例</h3>
-                {examples.map((example, index) => (
-                  <div key={index} className="space-y-2 rounded-lg border p-4">
-                    <div>
-                      <span className="font-medium">输入：</span>
-                      <pre className="mt-2 rounded-md bg-muted p-4 overflow-x-auto">
-                        <code>{example.input}</code>
-                      </pre>
-                    </div>
-                    <div>
-                      <span className="font-medium">输出：</span>
-                      <pre className="mt-2 rounded-md bg-muted p-4 overflow-x-auto">
-                        <code>{example.output}</code>
-                      </pre>
-                    </div>
-                    {example.explanation && (
+              {questionType === 'algorithm' && examples && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">示例</h3>
+                  {examples.map((example, index) => (
+                    <div key={index} className="space-y-2 rounded-lg border p-4">
                       <div>
-                        <span className="font-medium">解释：</span>
-                        <p className="mt-1">{example.explanation}</p>
+                        <span className="font-medium">输入：</span>
+                        <pre className="mt-2 rounded-md bg-muted p-4 overflow-x-auto">
+                          <code>{example.input}</code>
+                        </pre>
                       </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-              
-              <div className="space-y-2">
-                <h3 className="text-lg font-medium">约束条件</h3>
-                <ul className="list-disc pl-5 space-y-1">
-                  {constraints.map((constraint, index) => (
-                    <li key={index}>{constraint}</li>
+                      <div>
+                        <span className="font-medium">输出：</span>
+                        <pre className="mt-2 rounded-md bg-muted p-4 overflow-x-auto">
+                          <code>{example.output}</code>
+                        </pre>
+                      </div>
+                      {example.explanation && (
+                        <div>
+                          <span className="font-medium">解释：</span>
+                          <p className="mt-1">{example.explanation}</p>
+                        </div>
+                      )}
+                    </div>
                   ))}
-                </ul>
-              </div>
-              
-              {hints && hints.length > 0 && (
+                </div>
+              )}
+              {questionType === 'algorithm' && constraints && (
                 <div className="space-y-2">
-                  <h3 className="text-lg font-medium">提示</h3>
-                  <div className="space-y-2">
-                    {hints.map((hint, index) => (
-                      <div key={index} className="rounded-lg border p-4">
-                        <p>{hint}</p>
-                      </div>
+                  <h3 className="text-lg font-medium">约束条件</h3>
+                  <ul className="list-disc pl-5 space-y-1">
+                    {constraints.map((constraint, index) => (
+                      <li key={index}>{constraint}</li>
                     ))}
-                  </div>
+                  </ul>
+                </div>
+              )}
+              {questionType !== 'algorithm' && answer && (
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium">参考答案</h3>
+                  <div className="rounded-lg border p-4">{answer}</div>
+                </div>
+              )}
+              {analysis && (
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium">解析</h3>
+                  <div className="rounded-lg border p-4">{analysis}</div>
+                </div>
+              )}
+              {followUps && followUps.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium">追问</h3>
+                  <ul className="list-disc pl-5 space-y-1">
+                    {followUps.map((item, idx) => <li key={idx}>{item}</li>)}
+                  </ul>
+                </div>
+              )}
+              {resources && resources.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium">参考资料</h3>
+                  <ul className="list-disc pl-5 space-y-1">
+                    {resources.map((res, idx) => (
+                      <li key={idx}>
+                        <a href={res.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">{res.name}</a>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </TabsContent>
@@ -214,6 +252,7 @@ function InterviewQuestionDetail({
 export default function InterviewQuestionDetailPage() {
   const questionData: InterviewQuestionProps = {
     title: "两数之和",
+    questionType: "algorithm",
     difficulty: "easy",
     category: "数组",
     tags: ["哈希表", "查找"],
@@ -243,6 +282,16 @@ export default function InterviewQuestionDetailPage() {
     hints: [
       "尝试使用哈希表来优化查找过程",
       "对于每个元素 x，检查是否存在 target - x"
+    ],
+    answer: "答案：[0, 1]",
+    analysis: "分析：使用哈希表来解决这个问题，通过一次遍历数组，对于每个元素，我们检查哈希表中是否存在目标值减去当前元素的值。如果存在，我们找到了答案；如果不存在，我们将当前元素及其索引添加到哈希表中。这种方法的时间复杂度为 O(n)，空间复杂度也为 O(n)。",
+    followUps: [
+      "如果数组中存在重复元素，如何处理？",
+      "如果数组中存在负数，如何处理？"
+    ],
+    resources: [
+      { name: "LeetCode", url: "https://leetcode.com/" },
+      { name: "GeeksforGeeks", url: "https://www.geeksforgeeks.org/" }
     ],
     relatedQuestions: [
       {
